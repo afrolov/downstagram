@@ -5,7 +5,11 @@ var version = require('../package.json').version;
 var config = require('../lib/config.js');
 
 function showHelp(){
-    console.log('Usage: downstagram [-m|--metadata] <username>');
+    console.log('Usage: downstagram [OPTION]... <username>');
+    console.log('\nOptions:');
+    console.log('  -m, --metadata           -- also save associated metadata (JSON)');
+    console.log('  -o, --output <directory> -- output directory');
+    console.log('  --no-progress-bar        -- do not show progress bar');
 }
 
 function showVersion(){
@@ -17,31 +21,49 @@ if (!config.auth.access_token) {
 } else {
     var args = process.argv;
     args.splice(0, 2);
-
     var username;
-    var keepMetadata = false;
-    var first = args.shift();
 
-    if (!first) {
+    if (args.length === 0) {
         showHelp();
         process.exit(0);
     }
 
-    if (first.indexOf('-') === 0) {
-        if (first === '-v' || first === '--version') {
-            showVersion();
-            process.exit(0);
-        } else if ((first === '-m' || first === '--metadata') && args.length > 0) {
-            keepMetadata = true;
-            username = args.shift();
+    var options = {
+	keepMetadata: false,
+	outputDirectory: '.',
+	showProgressBar: true,
+    };
+    var i = 0;
+    while (i<args.length) {
+        var argument = args[i];
+        if (argument.indexOf('-') === 0) {
+            if (argument === '-v' || argument === '--version') {
+                showVersion();
+                process.exit(0);
+            } else if (argument === '-m' || argument === '--metadata') {
+                options.keepMetadata = true;
+            } else if (argument === '--no-progress-bar') {
+                options.showProgressBar = false;
+            } else if (argument === '-h' || argument === '--help') {
+                showHelp();
+                process.exit(0);
+            } else if (argument === '-o' || argument === '--output') {
+                if (i+1 === args.length) {
+                    console.error('-o option requires an argument');
+                    process.exit(1);
+                }
+                i += 1;
+                options.outputDirectory = args[i];
+            } else {
+                showHelp();
+                process.exit(1);
+            }
         } else {
-            showHelp();
-            process.exit(first === '-h' || first === '--help' ? 0 : 1);
+            username = argument;
         }
-    } else {
-        username = first;
+        i++;
     }
 
-    var ds = new Downstagram(username, keepMetadata);
+    var ds = new Downstagram(username, options);
     ds.start();
 }

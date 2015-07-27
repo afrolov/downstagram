@@ -1,6 +1,6 @@
 {
   "name": "downstagram",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Command line tool to download and backup all your instagram photos",
   "author": "Rogério Vicente <rogeriopvl@gmail.com>",
   "keywords": [
@@ -27,7 +27,8 @@
   "dependencies": {
     "instagram-node-lib": "~0.1.1",
     "pace": "~0.0.4",
-    "open": "0.0.4"
+    "open": "0.0.4",
+    "mkdirp": "~0.5.1"
   },
   "engines": {
     "node": ">=0.8.0"
